@@ -13,6 +13,11 @@ import android.widget.TextView
 class MainActivity : AppCompatActivity() {
 
     lateinit var sManager: SensorManager
+    private var magnit = FloatArray(9)
+    private var gravity = FloatArray(9)
+    private var acceler = FloatArray(3)
+    private var magnetfield = FloatArray(3)
+    private var value = FloatArray(3)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,18 +27,22 @@ class MainActivity : AppCompatActivity() {
 
         sManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensor = sManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        val sensor2 = sManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
         val sListner = object :SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
-                val value = event?.values
-                val sData = "X ${value?.get(0)} \nY ${value?.get(1)} \nZ ${value?.get(2)}"
-                tvSensor.text = sData
+                when(event?.sensor?.type){
+                    Sensor.TYPE_ACCELEROMETER -> acceler = event.values.clone()
+                    Sensor.TYPE_MAGNETIC_FIELD -> magnetfield = event.values.clone()
+                }
+
             }
 
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-                TODO("Not yet implemented")
+
             }
         }
         sManager.registerListener(sListner, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sManager.registerListener(sListner, sensor2, SensorManager.SENSOR_DELAY_NORMAL)
     }
 }
