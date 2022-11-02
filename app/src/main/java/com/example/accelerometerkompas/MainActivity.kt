@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
                 TODO("Not yet implemented")
             }
-
         }
         sManager.registerListener(sListner, sensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
