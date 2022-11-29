@@ -60,10 +60,14 @@ class MainActivity : AppCompatActivity() {
                 lRotation.setBackgroundColor(colorLayout)
                 tvSensor.text = rotateMiddle.toInt().toString()
             }
+
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             }
+
         }
         sManager.registerListener(sListner, sensor, SensorManager.SENSOR_DELAY_NORMAL)
         sManager.registerListener(sListner, sensor2, SensorManager.SENSOR_DELAY_NORMAL)
+
     }
+
 }
