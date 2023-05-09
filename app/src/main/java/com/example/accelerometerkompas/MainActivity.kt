@@ -62,15 +62,14 @@ class MainActivity : AppCompatActivity() {
                 when (event?.sensor?.type) {
                     Sensor.TYPE_ACCELEROMETER -> acceler = event.values.clone()
                     Sensor.TYPE_MAGNETIC_FIELD -> magnetfield = event.values.clone()
-                    Sensor.TYPE_ORIENTATION -> magnetfield = event.values.clone()
                 }
 
                 SensorManager.getRotationMatrix(gravity, magnit, acceler, magnetfield)
                 val outGravity = FloatArray(9)
                 SensorManager.remapCoordinateSystem(
                     gravity,
+                    SensorManager.AXIS_X,
                     SensorManager.AXIS_Y,
-                    SensorManager.AXIS_Z,
                     outGravity
                 )
 //                SensorManager.getOrientation(outGravity, values)
