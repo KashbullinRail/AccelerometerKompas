@@ -2,11 +2,9 @@ package com.example.accelerometerkompas
 
 import android.content.Context
 import android.graphics.Color
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,14 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var sensorManager: SensorManager
-    private var sensor: Sensor? = null
-    private var sensor2: Sensor? = null
-//    private val sListner by lazy { SensorEventListener() }
-    private var magnit = FloatArray(9)
-    private var gravity = FloatArray(9)
-    private var acceler = FloatArray(3)
-    private var magnetfield = FloatArray(3)
-    private var values = FloatArray(3)
+
+    private var angles = 0
+
+//    private var sensor: Sensor? = null
+//    private var sensor2: Sensor? = null
+////    private val sListner by lazy { SensorEventListener() }
+//    private var magnit = FloatArray(9)
+//    private var gravity = FloatArray(9)
+//    private var acceler = FloatArray(3)
+//    private var magnetfield = FloatArray(3)
+//    private var values = FloatArray(3)
 
 //    private lateinit var sensorManager: SensorManager
 //    private val accelerometerReading = FloatArray(3)
@@ -39,12 +40,25 @@ class MainActivity : AppCompatActivity() {
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
+        val compas: Compas = object: Compas(sensorManager) {
+            override fun compasAngle(angle: Int) {
+                angles = angle
+                Log.d("TAGG", angles.toString())
+            }
+        }
+
+//        var angle = compas.compas(sensorManager = sensorManager)
+
+
+
         val tvSensor = findViewById<TextView>(R.id.tvSensor)
         val lRotation = findViewById<LinearLayout>(R.id.lRotation)
 //
 //        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        val sensor2 = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+
+//        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+//        val sensor2 = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 //
 //        val sensor2 = sManager.getDefaultSensor(Sensor.TYPE_ORIENTATION)
 
@@ -56,58 +70,73 @@ class MainActivity : AppCompatActivity() {
 //            // Failure! No magnetometer.
 //        }
 
-        val sListner = object : SensorEventListener {
-            override fun onSensorChanged(event: SensorEvent?) {
-                var rotateMiddle = 0.0
-                when (event?.sensor?.type) {
-                    Sensor.TYPE_ACCELEROMETER -> acceler = event.values.clone()
-                    Sensor.TYPE_MAGNETIC_FIELD -> magnetfield = event.values.clone()
-                }
-
-                SensorManager.getRotationMatrix(gravity, magnit, acceler, magnetfield)
-                val outGravity = FloatArray(9)
-                SensorManager.remapCoordinateSystem(
-                    gravity,
-                    SensorManager.AXIS_X,
-                    SensorManager.AXIS_Y,
-                    outGravity
-                )
-//                SensorManager.getOrientation(outGravity, values)
-                SensorManager.getOrientation(gravity, values)
-
-                val degree = Math.toDegrees(values[0].toDouble())
-
-                rotateMiddle = when(degree.toInt()) {
-                   in 0..180 -> degree
-                   in -180..0 -> degree + 360
-                    else -> { degree }
-                }
-
-//                if (degree < 0) {
-////                    lRotation.rotation = degree.toFloat() + 270
-//                    var rotateMiddle =  degree + 360
-//                } else {
-//                    rotateMiddle = degree
-//                }
+        compas.start()
 
 
-                val colorLayout = if(rotateMiddle.toInt() == 0) {
+
+
+        val colorLayout = if(angles == 0) {
                     Color.GREEN
                 } else {
                     Color.RED
                 }
-                lRotation.setBackgroundColor(colorLayout)
-                tvSensor.text = rotateMiddle.toInt().toString()
+        lRotation.setBackgroundColor(colorLayout)
+        tvSensor.text = angles.toString()
 
+        if (angles > 300) compas.close()
 
-            }
+//        val sListner = object : SensorEventListener {
+//            override fun onSensorChanged(event: SensorEvent?) {
+//                var rotateMiddle = 0.0
+//                when (event?.sensor?.type) {
+//                    Sensor.TYPE_ACCELEROMETER -> acceler = event.values.clone()
+//                    Sensor.TYPE_MAGNETIC_FIELD -> magnetfield = event.values.clone()
+//                }
 //
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            }
+//                SensorManager.getRotationMatrix(gravity, magnit, acceler, magnetfield)
+//                val outGravity = FloatArray(9)
+//                SensorManager.remapCoordinateSystem(
+//                    gravity,
+//                    SensorManager.AXIS_X,
+//                    SensorManager.AXIS_Y,
+//                    outGravity
+//                )
+////                SensorManager.getOrientation(outGravity, values)
+//                SensorManager.getOrientation(outGravity, values)
 //
-        }
-        sensorManager.registerListener(sListner, sensor, SensorManager.SENSOR_DELAY_NORMAL)
-        sensorManager.registerListener(sListner, sensor2, SensorManager.SENSOR_DELAY_NORMAL)
+//                val degree = Math.toDegrees(values[0].toDouble())
+//
+//                rotateMiddle = when(degree.toInt()) {
+//                   in 0..180 -> degree
+//                   in -180..0 -> degree + 360
+//                    else -> { degree }
+//                }
+//
+////                if (degree < 0) {
+//////                    lRotation.rotation = degree.toFloat() + 270
+////                    var rotateMiddle =  degree + 360
+////                } else {
+////                    rotateMiddle = degree
+////                }
+//
+//
+//                val colorLayout = if(rotateMiddle.toInt() == 0) {
+//                    Color.GREEN
+//                } else {
+//                    Color.RED
+//                }
+//                lRotation.setBackgroundColor(colorLayout)
+//                tvSensor.text = rotateMiddle.toInt().toString()
+//
+//
+//            }
+////
+//            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+//            }
+////
+//        }
+//        sensorManager.registerListener(sListner, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+//        sensorManager.registerListener(sListner, sensor2, SensorManager.SENSOR_DELAY_NORMAL)
 
     }
 
